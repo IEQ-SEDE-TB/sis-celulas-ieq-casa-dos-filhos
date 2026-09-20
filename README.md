@@ -97,3 +97,25 @@ Depois de `schema.sql` e `policies_auth.sql`, rode
 (`meeting-pdfs`, `video-thumbnails`), as policies de acesso a eles e as
 policies de RLS de `themes`/`meetings` (somente admin/senior podem
 ler/escrever, por enquanto).
+
+## Cadastro de Células e Membros (admin/senior)
+
+- `app/(protected)/admin/celulas/`: CRUD de células (`/admin/celulas`,
+  com seleção de líder entre os `profiles` `role=leader` e
+  `status=approved`) e, para cada célula, CRUD de membros
+  (`/admin/celulas/[id]/membros`).
+- `cells.member_count` é recalculado automaticamente (contagem de
+  membros ativos não-visitantes) a cada criação/edição/ativação de
+  membro — ver `recalculateMemberCount` em
+  `app/(protected)/admin/celulas/[id]/membros/actions.ts`.
+- `lib/data/default-church.ts`: por enquanto o sistema atende uma única
+  igreja; toda célula nova é associada à primeira linha de `churches`
+  (criada automaticamente como "Casa dos Filhos" se ainda não existir).
+
+Rode `supabase/admin_celulas_membros.sql` depois de
+`admin_temas_reunioes.sql` (reaproveita a função
+`current_profile_role()` criada nele) — cria as policies de RLS de
+`churches`/`cells`/`members` (admin/senior). O arquivo também já traz,
+comentado, o esboço das policies que darão ao líder acesso de leitura à
+própria célula/membros — ainda não deve ser executado, fica pronto para
+quando o dashboard do líder for construído.

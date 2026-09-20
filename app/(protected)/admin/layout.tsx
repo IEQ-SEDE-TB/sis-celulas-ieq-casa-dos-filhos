@@ -31,6 +31,14 @@ export default async function AdminLayout({
             Voltar
           </Link>
         </div>
+        <nav className="mx-auto flex max-w-5xl gap-4 px-6 pb-4 text-sm">
+          <Link href="/admin/temas" className="text-secondary-200 hover:text-white">
+            Temas
+          </Link>
+          <Link href="/admin/celulas" className="text-secondary-200 hover:text-white">
+            Células
+          </Link>
+        </nav>
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-8">{children}</main>
