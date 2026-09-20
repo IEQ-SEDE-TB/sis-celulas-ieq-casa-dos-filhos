@@ -32,6 +32,9 @@ export default async function AdminLayout({
           </Link>
         </div>
         <nav className="mx-auto flex max-w-5xl gap-4 px-6 pb-4 text-sm">
+          <Link href="/admin/dashboard" className="text-secondary-200 hover:text-white">
+            Dashboard
+          </Link>
           <Link href="/admin/temas" className="text-secondary-200 hover:text-white">
             Temas
           </Link>

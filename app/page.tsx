@@ -14,7 +14,7 @@ export default async function HomePage() {
 
   if (isApproved && current?.profile) {
     if (current.profile.role === "admin" || current.profile.role === "senior") {
-      redirect("/admin/temas");
+      redirect("/admin/dashboard");
     }
 
     if (current.profile.role === "leader") {

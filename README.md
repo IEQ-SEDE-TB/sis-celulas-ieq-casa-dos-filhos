@@ -144,8 +144,8 @@ atualizar qualquer perfil.
 
 - Página inicial (`app/page.tsx`): líder aprovado e já vinculado a uma
   célula (`cells.leader_id`) é redirecionado para `/lider/dashboard`;
-  admin/senior vai para `/admin/temas`; líder sem célula vinculada vê um
-  aviso para contatar um administrador.
+  admin/senior vai para `/admin/dashboard`; líder sem célula vinculada
+  vê um aviso para contatar um administrador.
 - `/lider/dashboard`: resumo da célula, métricas do tema ativo no
   momento (`themes.active = true`) — reuniões realizadas, pendentes vs.
   atrasadas, frequência média de presença, visitantes recebidos — e a
@@ -169,3 +169,31 @@ de leitura a `themes`/`meetings` ativos, cria as policies de
 `meeting_records` (admin/senior têm acesso total; líder só lê/cria/edita
 os registros da própria célula) e adiciona a constraint `unique
 (cell_id, meeting_id)` usada pelo "marcar como realizada".
+
+## Dashboard Geral (admin/senior)
+
+- `/admin/dashboard`: agora é a página inicial da área administrativa
+  (nav "Dashboard" primeiro, redirecionamento de admin/senior a partir
+  de `/`). Métricas do topo: células ativas, membros ativos (soma de
+  `cells.member_count`), líderes aprovados e — só quando existe um tema
+  com `active=true` cuja vigência inclui hoje — reuniões
+  realizadas/pendentes/atrasadas/visitantes recebidos desse tema,
+  somando todas as células ativas.
+- Tabela "Células — Visão Geral": nome, líder, membros, "X/Y reuniões"
+  do tema selecionado no filtro (independente do tema usado nas
+  métricas do topo) com indicador 🟢/🟡/🔴 — `lib/data/cell-progress.ts`
+  (`computeCellProgressStatus`) compara o progresso real com o ritmo
+  esperado (reuniões distribuídas uniformemente entre `start_date` e
+  `end_date` do tema): 🔴 vigência encerrada com reunião sem registro,
+  🟡 dentro do prazo mas atrasada em relação ao esperado, 🟢 em dia.
+- Filtros por tema (todos, não só o ativo) e por status da célula —
+  `<form method="GET">` simples, sem JS: a própria navegação do
+  navegador aplica `?tema=...&status=...` e a página (Server Component)
+  refaz as queries.
+- Sem tema ativo agora, o dashboard mostra um aviso no topo mas
+  continua exibindo a tabela de células normalmente (o filtro de tema
+  ainda permite escolher um ciclo passado para revisar).
+- Não precisou de SQL novo: reaproveita as policies de leitura para
+  admin/senior já criadas em `admin_temas_reunioes.sql`,
+  `admin_celulas_membros.sql`, `lider_dashboard.sql` (meeting_records)
+  e `admin_usuarios.sql` (profiles).
