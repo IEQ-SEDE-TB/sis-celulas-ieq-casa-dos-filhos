@@ -67,10 +67,10 @@ export type Meeting = {
   theme_id: string;
   meeting_number: number;
   pdf_url: string | null;
-  checklist: Record<string, unknown> | null;
-  verses: Record<string, unknown> | null;
+  checklist: string[] | null;
+  verses: string[] | null;
   dynamic_idea: string | null;
-  key_questions: Record<string, unknown> | null;
+  key_questions: string[] | null;
   video_url: string | null;
   video_thumbnail_url: string | null;
 };

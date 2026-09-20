@@ -78,3 +78,22 @@ o próprio registro em `profiles`).
      para a URL do Vercel em produção).
    - **Redirect URLs**: adicione `http://localhost:3000/auth/callback`
      (e a versão de produção, ex: `https://seu-dominio.vercel.app/auth/callback`).
+
+## Gestão de Temas e Reuniões (admin/senior)
+
+- `app/(protected)/admin/temas/`: CRUD de temas (`/admin/temas`) e, para
+  cada tema, CRUD das reuniões (`/admin/temas/[id]/reunioes`), com upload
+  de PDF da pregação e capa do vídeo para o Supabase Storage.
+- `app/(protected)/admin/layout.tsx`: só libera acesso a usuários com
+  `role` `admin` ou `senior` (`lib/auth/require-role.ts`); cada Server
+  Action do módulo repete essa checagem.
+- `components/ui/` (Button, Card, Badge): componentes visuais base,
+  reaproveitados pelas próximas áreas do sistema. A cor `secondary`
+  (roxo, definida em `tailwind.config.ts`) é usada só na área
+  administrativa.
+
+Depois de `schema.sql` e `policies_auth.sql`, rode
+`supabase/admin_temas_reunioes.sql` — ele cria os buckets de Storage
+(`meeting-pdfs`, `video-thumbnails`), as policies de acesso a eles e as
+policies de RLS de `themes`/`meetings` (somente admin/senior podem
+ler/escrever, por enquanto).
