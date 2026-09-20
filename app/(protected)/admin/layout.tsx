@@ -17,7 +17,7 @@ export default async function AdminLayout({
   // layout para cobrir todas as rotas de /admin de uma vez só — mas cada
   // Server Action deste módulo repete a checagem, pois uma Server Action
   // não passa pela árvore de layouts ao ser invocada.
-  await requireAdminOrSenior();
+  const profile = await requireAdminOrSenior();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -25,6 +25,7 @@ export default async function AdminLayout({
         variant="admin"
         eyebrow="Painel administrativo"
         navItems={NAV_ITEMS}
+        userName={profile.full_name}
       />
       <main className="mx-auto max-w-5xl px-6 py-8">{children}</main>
     </div>

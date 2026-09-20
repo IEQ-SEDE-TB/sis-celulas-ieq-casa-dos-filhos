@@ -46,3 +46,18 @@ export async function requireLeader(): Promise<Profile> {
 
   return current.profile;
 }
+
+/**
+ * Garante que o usuário logado está aprovado, sem exigir nenhuma role
+ * específica; caso contrário redireciona para a página inicial. Usada
+ * em páginas que qualquer usuário aprovado pode acessar (ex: /perfil).
+ */
+export async function requireApprovedUser(): Promise<Profile> {
+  const current = await getCurrentProfile();
+
+  if (!current || !current.profile || current.profile.status !== "approved") {
+    redirect("/");
+  }
+
+  return current.profile;
+}

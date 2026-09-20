@@ -4,29 +4,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdminOrSenior } from "@/lib/auth/require-role";
+import { recalculateMemberCount } from "@/lib/data/member-count";
 
 export type MemberFormState = { error: string } | null;
-
-/**
- * Recalcula `cells.member_count` a partir dos membros atuais (ativos e
- * não-visitantes), em vez de somar/subtrair incrementalmente — mais
- * simples e não fica dessincronizado se algo falhar no meio do caminho.
- */
-async function recalculateMemberCount(cellId: string) {
-  const supabase = createClient();
-
-  const { count } = await supabase
-    .from("members")
-    .select("id", { count: "exact", head: true })
-    .eq("cell_id", cellId)
-    .eq("active", true)
-    .eq("is_visitor", false);
-
-  await supabase
-    .from("cells")
-    .update({ member_count: count ?? 0 })
-    .eq("id", cellId);
-}
 
 /**
  * Cria ou atualiza um membro, dependendo de haver ou não um `id`

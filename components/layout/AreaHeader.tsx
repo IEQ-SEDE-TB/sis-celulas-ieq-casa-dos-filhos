@@ -30,10 +30,12 @@ export function AreaHeader({
   variant,
   eyebrow,
   navItems,
+  userName,
 }: {
   variant: Variant;
   eyebrow: string;
   navItems: { href: string; label: string }[];
+  userName?: string;
 }) {
   const classes = VARIANT_CLASSES[variant];
 
@@ -53,9 +55,20 @@ export function AreaHeader({
             </h1>
           </div>
         </div>
-        <Link href="/" className={`text-sm underline ${classes.link}`}>
-          Voltar
-        </Link>
+        <div className="flex items-center gap-4 text-sm">
+          {userName && (
+            <Link
+              href="/perfil"
+              className={`underline ${classes.link}`}
+              title="Meu perfil"
+            >
+              {userName}
+            </Link>
+          )}
+          <Link href="/" className={`underline ${classes.link}`}>
+            Voltar
+          </Link>
+        </div>
       </div>
       <nav className="mx-auto flex max-w-5xl flex-wrap gap-4 px-6 pb-4 text-sm">
         {navItems.map((item) => (

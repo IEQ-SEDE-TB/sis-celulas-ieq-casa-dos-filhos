@@ -241,3 +241,52 @@ Rode `supabase/lider_criar_celula.sql` depois de `lider_dashboard.sql`
 - `components/layout/AreaHeader.tsx`: cabeçalho compartilhado por
   `/admin` (roxo) e `/lider` (azul) — antes cada layout tinha o próprio
   JSX duplicado; agora só muda `variant`, `eyebrow` e `navItems`.
+
+## Líder gerencia membros da própria célula
+
+- `/lider/membros` (+ `novo` e `[memberId]/editar`): mesma UI do
+  módulo de membros do admin (lista, badge "Visitante", status,
+  formulário nome+telefone+visitante), mas a célula usada é **sempre**
+  a do líder logado (`getLeaderCell`) — nunca um `cell_id` vindo de URL
+  ou formulário, mesmo padrão de segurança de
+  `/lider/reuniao/[meetingId]`. `cells.member_count` é recalculado do
+  mesmo jeito que no módulo do admin.
+- `lib/data/member-count.ts`: `recalculateMemberCount(cellId)` agora é
+  compartilhado entre admin e líder (antes era uma função privada
+  duplicável dentro do actions.ts do admin). Por baixo, chama a função
+  `recalculate_cell_member_count` no banco (ver SQL abaixo) em vez de
+  fazer `select count` + `update` direto — o líder só tem policy de
+  **leitura** na própria célula, não de update, então o update do
+  `member_count` precisa rodar como `SECURITY DEFINER`.
+- "Membros" foi adicionado à navegação de `/lider`, ao lado de
+  "Dashboard".
+
+## Meu perfil (qualquer usuário aprovado)
+
+- `/perfil`: qualquer usuário aprovado (admin, senior ou leader) edita
+  o próprio `full_name` — o nome do Google só valia no primeiro login,
+  agora pode ser alterado por aqui. Acessível pelo nome clicável que
+  apareceu no canto superior direito dos cabeçalhos de `/admin` e
+  `/lider` (`AreaHeader` ganhou a prop `userName`).
+- **Importante**: `policies_auth.sql` só tinha policies de
+  select/insert do próprio perfil — **não havia** policy de update do
+  próprio perfil como se imaginava. Uma policy genérica "dono do
+  registro pode atualizar `profiles`" seria arriscada: RLS não
+  restringe por coluna, então o próprio usuário também poderia tentar
+  mudar `role`/`status` via API direta (ex: se autopromover a admin).
+  Por isso a Server Action chama a função `update_own_full_name`
+  (`SECURITY DEFINER`, ver SQL abaixo), que só aceita o novo nome como
+  argumento — não há como mandar mais nada além disso.
+- `lib/auth/require-role.ts` ganhou `requireApprovedUser()` (sem
+  exigir role específica), usada em `/perfil` e na Server Action.
+
+Rode `supabase/lider_membros_perfil.sql` depois de `lider_dashboard.sql`
+(reaproveita `current_profile_id()`, `is_approved_leader()` e
+`current_profile_role()`). Ele cria:
+- `members_insert_own_cell_leader` e `members_update_own_cell_leader`
+  (select próprio já existia desde `lider_dashboard.sql`).
+- a função `recalculate_cell_member_count(target_cell_id)` —
+  `SECURITY DEFINER` que confere sozinha se quem chamou é admin/senior
+  ou o líder daquela célula antes de recalcular.
+- a função `update_own_full_name(new_full_name)` — `SECURITY DEFINER`
+  que só atualiza o `full_name` de quem está logado.

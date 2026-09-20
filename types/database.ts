@@ -148,7 +148,16 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      recalculate_cell_member_count: {
+        Args: { target_cell_id: string };
+        Returns: void;
+      };
+      update_own_full_name: {
+        Args: { new_full_name: string };
+        Returns: void;
+      };
+    };
     Enums: {
       user_role: UserRole;
       profile_status: ProfileStatus;
