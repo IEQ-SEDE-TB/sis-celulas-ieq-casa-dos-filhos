@@ -1,9 +1,14 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isPublicPath } from "@/lib/auth/routes";
 
 /**
- * Atualiza a sessao do Supabase a cada request (usado pelo middleware.ts na raiz).
- * Necessario para manter o usuario logado ao navegar entre paginas/Server Components.
+ * Atualiza a sessao do Supabase a cada request e protege as rotas que nao
+ * estao na lista de rotas publicas (ver lib/auth/routes.ts):
+ * - sem sessao -> redireciona para a landing page ("/")
+ * - sessao mas profile "pending"/"blocked" (ou inexistente) -> "/aguardando-aprovacao"
+ * - profile "approved" -> segue normalmente (o role fica disponivel via
+ *   useProfile(), fornecido pelo layout de app/(protected))
  */
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
@@ -47,7 +52,29 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  if (isPublicPath(pathname)) {
+    return response;
+  }
+
+  if (!user) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("status")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+
+  if (!profile || profile.status === "pending" || profile.status === "blocked") {
+    return NextResponse.redirect(new URL("/aguardando-aprovacao", request.url));
+  }
 
   return response;
 }

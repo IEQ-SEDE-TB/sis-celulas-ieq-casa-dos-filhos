@@ -1,17 +1,36 @@
 "use client";
 
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
 export function GoogleSignInButton() {
-  const handleClick = () => {
-    // TODO: integrar com supabase.auth.signInWithOAuth({ provider: "google" })
-    // nesta etapa o botao ainda nao possui logica de autenticacao.
-    console.log("Entrar com Google - logica de autenticacao ainda nao implementada");
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    setLoading(true);
+    const supabase = createClient();
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      console.error("Erro ao iniciar login com Google:", error.message);
+      setLoading(false);
+    }
+    // Em caso de sucesso o navegador é redirecionado para o Google,
+    // então não há necessidade de resetar o estado de loading aqui.
   };
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      className="inline-flex items-center gap-3 rounded-md border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+      disabled={loading}
+      className="inline-flex items-center gap-3 rounded-md border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
     >
       <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
         <path
@@ -31,7 +50,7 @@ export function GoogleSignInButton() {
           d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.28 6.6l3.99 3.11C6.22 6.86 8.87 4.75 12 4.75z"
         />
       </svg>
-      Entrar com Google
+      {loading ? "Redirecionando..." : "Entrar com Google"}
     </button>
   );
 }
