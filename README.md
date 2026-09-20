@@ -117,6 +117,29 @@ Rode `supabase/admin_celulas_membros.sql` depois de
 `current_profile_role()` criada nele) — cria as policies de RLS de
 `churches`/`cells`/`members` (admin/senior).
 
+## Gestão de Usuários (admin/senior)
+
+- `/admin/usuarios`: lista todos os `profiles` (nome, e-mail, role,
+  status, data de criação) com filtros por status e role. Ações por
+  linha: aprovar (`status=pending` → `approved` + `role=leader`),
+  rejeitar/bloquear, reativar, e trocar role (`approved`).
+- Um usuário nunca pode alterar o próprio status/role por essa tela —
+  a UI esconde os controles na própria linha e a Server Action rejeita
+  a chamada mesmo assim (`assertNotSelf` em
+  `app/(protected)/admin/usuarios/actions.ts`).
+- Só `admin` pode promover alguém para `admin`/`senior`; um `senior`
+  só consegue aprovar/gerenciar como `leader` — checado tanto nas
+  opções do `<select>` quanto na Server Action (`changeUserRole`).
+- Antes deste módulo, `profiles` só tinha as policies de
+  `policies_auth.sql` (cada usuário lê/cria só a própria linha), então
+  nem o select de líderes no formulário de célula nem esta tela
+  conseguiam ler outros usuários.
+
+Rode `supabase/admin_usuarios.sql` depois de `admin_temas_reunioes.sql`
+(reaproveita `current_profile_role()`) — cria as duas policies que
+faltavam em `profiles`: admin/senior podem ler todos os perfis e
+atualizar qualquer perfil.
+
 ## Dashboard do Líder
 
 - Página inicial (`app/page.tsx`): líder aprovado e já vinculado a uma

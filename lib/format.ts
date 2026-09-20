@@ -11,3 +11,16 @@ export function formatDateBR(dateStr: string | null): string {
 
   return `${day}/${month}/${year}`;
 }
+
+/**
+ * Formata um timestamp ISO (coluna timestamptz, ex: `created_at`) para
+ * "DD/MM/AAAA".
+ */
+export function formatTimestampBR(isoStr: string | null): string {
+  if (!isoStr) return "—";
+
+  const date = new Date(isoStr);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+}

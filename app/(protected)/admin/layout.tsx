@@ -38,6 +38,9 @@ export default async function AdminLayout({
           <Link href="/admin/celulas" className="text-secondary-200 hover:text-white">
             Células
           </Link>
+          <Link href="/admin/usuarios" className="text-secondary-200 hover:text-white">
+            Usuários
+          </Link>
         </nav>
       </header>
 
