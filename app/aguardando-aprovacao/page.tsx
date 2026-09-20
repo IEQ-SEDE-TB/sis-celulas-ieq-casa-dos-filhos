@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
+import { Logo } from "@/components/ui/Logo";
 
 export default async function AguardandoAprovacaoPage() {
   const current = await getCurrentProfile();
@@ -17,7 +18,10 @@ export default async function AguardandoAprovacaoPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-10 text-center shadow-sm">
-        <h1 className="text-xl font-semibold text-gray-900">
+        <div className="flex justify-center">
+          <Logo size={72} />
+        </div>
+        <h1 className="mt-6 text-xl font-semibold text-gray-900">
           {isBlocked ? "Acesso bloqueado" : "Aguardando aprovação"}
         </h1>
         <p className="mt-3 text-sm text-gray-600">

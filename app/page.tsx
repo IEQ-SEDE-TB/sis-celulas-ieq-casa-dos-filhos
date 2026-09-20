@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { Logo } from "@/components/ui/Logo";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { getLeaderCell } from "@/lib/data/leader-cell";
 
@@ -28,9 +29,13 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-10 text-center shadow-sm">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-16">
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-lg sm:p-12">
+        <div className="flex justify-center">
+          <Logo size={96} priority />
+        </div>
+
+        <h1 className="mt-6 text-2xl font-semibold tracking-tight text-gray-900">
           SIS Células IEQ Casa dos Filhos
         </h1>
         <p className="mt-2 text-sm text-gray-500">
@@ -38,19 +43,19 @@ export default async function HomePage() {
         </p>
 
         {isApproved && current?.profile ? (
-          <div className="mt-8">
+          <div className="mt-10 space-y-4">
             <p className="text-sm text-gray-600">
               Login realizado com sucesso, {current.profile.full_name}.
             </p>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="-mt-2 text-xs text-gray-400">
               Perfil: {current.profile.role} &middot; {current.user.email}
             </p>
-            <p className="mt-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            <p className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700">
               Você ainda não está vinculado a nenhuma célula como líder.
               Fale com um administrador para que ele associe seu usuário
               a uma célula.
             </p>
-            <form action="/auth/signout" method="post" className="mt-6">
+            <form action="/auth/signout" method="post">
               <button
                 type="submit"
                 className="text-sm font-medium text-gray-500 underline hover:text-gray-700"
@@ -60,12 +65,12 @@ export default async function HomePage() {
             </form>
           </div>
         ) : (
-          <div className="mt-8 flex justify-center">
+          <div className="mt-10 flex justify-center">
             <GoogleSignInButton />
           </div>
         )}
 
-        <p className="mt-8 text-xs text-gray-400">
+        <p className="mt-10 text-xs text-gray-400">
           Sistema em desenvolvimento.
         </p>
       </div>

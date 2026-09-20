@@ -197,3 +197,19 @@ os registros da própria célula) e adiciona a constraint `unique
   admin/senior já criadas em `admin_temas_reunioes.sql`,
   `admin_celulas_membros.sql`, `lider_dashboard.sql` (meeting_records)
   e `admin_usuarios.sql` (profiles).
+
+## Identidade visual (logo)
+
+- `public/logo-ieq.png`: logo oficial da IEQ (cruz, pomba, cálice e
+  coroa), fundo transparente — funciona tanto sobre fundo claro quanto
+  sobre os cabeçalhos coloridos.
+- `components/ui/Logo.tsx`: wrapper de `next/image` em torno do
+  arquivo, com `alt` fixo ("Logo Igreja do Evangelho Quadrangular") e
+  `size` configurável. Usado na landing page (96px), em
+  `/aguardando-aprovacao` (72px) e nos cabeçalhos de `/admin`/`/lider`
+  (40px).
+- `app/layout.tsx`: `metadata.icons` aponta pra ele (favicon e
+  apple-touch-icon).
+- `components/layout/AreaHeader.tsx`: cabeçalho compartilhado por
+  `/admin` (roxo) e `/lider` (azul) — antes cada layout tinha o próprio
+  JSX duplicado; agora só muda `variant`, `eyebrow` e `navItems`.

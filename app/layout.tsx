@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   title: "SIS Células IEQ Casa dos Filhos",
   description:
     "Sistema de gestão de células da Igreja Quadrangular Sede Casa dos Filhos - Tubarão/SC",
+  icons: {
+    icon: "/logo-ieq.png",
+    apple: "/logo-ieq.png",
+  },
 };
 
 export default function RootLayout({
