@@ -11,21 +11,17 @@ export default async function HomePage() {
     redirect("/aguardando-aprovacao");
   }
 
-  const isApproved = current?.profile?.status === "approved";
+  if (current?.profile?.status === "approved") {
+    const { role, id } = current.profile;
 
-  if (isApproved && current?.profile) {
-    if (current.profile.role === "admin" || current.profile.role === "senior") {
+    if (role === "admin" || role === "senior") {
       redirect("/admin/dashboard");
     }
 
-    if (current.profile.role === "leader") {
-      const cell = await getLeaderCell(current.profile.id);
-      if (cell) {
-        redirect("/lider/dashboard");
-      }
-      // Leader sem célula vinculada ainda: fica na home com a mensagem
-      // abaixo, em vez de redirecionar para um dashboard vazio.
-    }
+    // role === "leader": vai para o dashboard se já tiver célula, ou
+    // para o cadastro de célula (autoatendimento) se ainda não tiver.
+    const cell = await getLeaderCell(id);
+    redirect(cell ? "/lider/dashboard" : "/lider/celula/nova");
   }
 
   return (
@@ -42,33 +38,9 @@ export default async function HomePage() {
           Igreja Quadrangular Sede &ldquo;Casa dos Filhos&rdquo; &mdash; Tubarão/SC
         </p>
 
-        {isApproved && current?.profile ? (
-          <div className="mt-10 space-y-4">
-            <p className="text-sm text-gray-600">
-              Login realizado com sucesso, {current.profile.full_name}.
-            </p>
-            <p className="-mt-2 text-xs text-gray-400">
-              Perfil: {current.profile.role} &middot; {current.user.email}
-            </p>
-            <p className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700">
-              Você ainda não está vinculado a nenhuma célula como líder.
-              Fale com um administrador para que ele associe seu usuário
-              a uma célula.
-            </p>
-            <form action="/auth/signout" method="post">
-              <button
-                type="submit"
-                className="text-sm font-medium text-gray-500 underline hover:text-gray-700"
-              >
-                Sair
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="mt-10 flex justify-center">
-            <GoogleSignInButton />
-          </div>
-        )}
+        <div className="mt-10 flex justify-center">
+          <GoogleSignInButton />
+        </div>
 
         <p className="mt-10 text-xs text-gray-400">
           Sistema em desenvolvimento.

@@ -3,9 +3,10 @@ import type { Cell } from "@/types/database";
 
 /**
  * Busca a célula em que `leader_id` é o profile informado. Retorna
- * `null` se o líder ainda não foi vinculado a nenhuma célula — quem
- * chama decide como exibir esse estado (ver /lider/dashboard, que
- * mostra uma mensagem orientando a contatar um admin).
+ * `null` se o líder ainda não foi vinculado a nenhuma célula — nesse
+ * caso o fluxo do app manda o usuário para /lider/celula/nova, onde
+ * ele mesmo cadastra a célula (ver app/page.tsx e
+ * app/(protected)/lider/dashboard/page.tsx).
  */
 export async function getLeaderCell(profileId: string): Promise<Cell | null> {
   const supabase = createClient();

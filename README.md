@@ -145,7 +145,8 @@ atualizar qualquer perfil.
 - Página inicial (`app/page.tsx`): líder aprovado e já vinculado a uma
   célula (`cells.leader_id`) é redirecionado para `/lider/dashboard`;
   admin/senior vai para `/admin/dashboard`; líder sem célula vinculada
-  vê um aviso para contatar um administrador.
+  vai para `/lider/celula/nova` (ver seção "Líder cadastra a própria
+  célula" abaixo).
 - `/lider/dashboard`: resumo da célula, métricas do tema ativo no
   momento (`themes.active = true`) — reuniões realizadas, pendentes vs.
   atrasadas, frequência média de presença, visitantes recebidos — e a
@@ -169,6 +170,33 @@ de leitura a `themes`/`meetings` ativos, cria as policies de
 `meeting_records` (admin/senior têm acesso total; líder só lê/cria/edita
 os registros da própria célula) e adiciona a constraint `unique
 (cell_id, meeting_id)` usada pelo "marcar como realizada".
+
+## Líder cadastra a própria célula
+
+- `/lider/celula/nova`: autoatendimento — um líder aprovado sem
+  nenhuma célula vinculada cadastra a própria célula (nome,
+  localização, endereço). Não tem campo de líder (é sempre quem está
+  logado) nem de "ativa" (nasce ativa, `member_count=0`). Se o líder já
+  tiver célula, a página redireciona para `/lider/dashboard`.
+- `app/page.tsx` e `/lider/dashboard` mandam para essa rota sempre que
+  `getLeaderCell(profile.id)` retorna `null` — não existe mais a
+  mensagem antiga de "fale com um administrador" para esse caso.
+- A Server Action (`app/(protected)/lider/celula/nova/actions.ts`)
+  confere de novo se o líder já tem célula antes de inserir (a página
+  já checa, mas a action pode ser chamada direto) e devolve uma
+  mensagem amigável em vez do erro cru do Postgres se a policy/constraint
+  barrar a gravação.
+
+Rode `supabase/lider_criar_celula.sql` depois de `lider_dashboard.sql`
+(usa as funções de lá). Duas policies novas:
+- `churches_select_approved`: qualquer usuário aprovado pode ler
+  `churches` — sem isso, `getDefaultChurchId()` (usado pelo líder para
+  achar a igreja padrão) não enxergava nada, já que só admin/senior
+  liam essa tabela até então.
+- `cells_insert_own_leader`: líder aprovado pode inserir em `cells`
+  apenas com `leader_id` = o próprio profile id, e só se ainda não
+  tiver nenhuma célula (`not exists`) — reforça no banco a mesma regra
+  já checada na Server Action.
 
 ## Dashboard Geral (admin/senior)
 

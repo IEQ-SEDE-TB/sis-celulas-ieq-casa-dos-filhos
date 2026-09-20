@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireLeader } from "@/lib/auth/require-role";
 import { getLeaderCell } from "@/lib/data/leader-cell";
@@ -16,21 +17,10 @@ export default async function LiderDashboardPage() {
   const profile = await requireLeader();
   const cell = await getLeaderCell(profile.id);
 
+  // A home já manda o líder sem célula para /lider/celula/nova; isso
+  // aqui é só defesa em profundidade caso ele chegue direto nesta URL.
   if (!cell) {
-    return (
-      <Card>
-        <CardBody>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Nenhuma célula vinculada
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Seu usuário ainda não está vinculado a nenhuma célula como
-            líder. Fale com um administrador para que ele associe seu
-            usuário a uma célula.
-          </p>
-        </CardBody>
-      </Card>
-    );
+    redirect("/lider/celula/nova");
   }
 
   const supabase = createClient();
