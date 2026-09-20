@@ -115,7 +115,34 @@ ler/escrever, por enquanto).
 Rode `supabase/admin_celulas_membros.sql` depois de
 `admin_temas_reunioes.sql` (reaproveita a função
 `current_profile_role()` criada nele) — cria as policies de RLS de
-`churches`/`cells`/`members` (admin/senior). O arquivo também já traz,
-comentado, o esboço das policies que darão ao líder acesso de leitura à
-própria célula/membros — ainda não deve ser executado, fica pronto para
-quando o dashboard do líder for construído.
+`churches`/`cells`/`members` (admin/senior).
+
+## Dashboard do Líder
+
+- Página inicial (`app/page.tsx`): líder aprovado e já vinculado a uma
+  célula (`cells.leader_id`) é redirecionado para `/lider/dashboard`;
+  admin/senior vai para `/admin/temas`; líder sem célula vinculada vê um
+  aviso para contatar um administrador.
+- `/lider/dashboard`: resumo da célula, métricas do tema ativo no
+  momento (`themes.active = true`) — reuniões realizadas, pendentes vs.
+  atrasadas, frequência média de presença, visitantes recebidos — e a
+  lista de reuniões do tema com indicador 🟢/🟡/🔴 conforme existe (ou
+  não) um `meeting_record` com `status="done"` e a vigência do tema.
+- `/lider/reuniao/[meetingId]`: conteúdo somente leitura da reunião
+  (checklist, versículos, dinâmica, perguntas, PDF, vídeo) + formulário
+  para marcar como realizada. A célula usada é sempre a do líder logado
+  (`getLeaderCell`, nunca um id vindo da URL/formulário).
+- `lib/data/leader-cell.ts`: `getLeaderCell(profileId)`, usado por
+  ambas as páginas acima.
+- `lib/auth/require-role.ts`: `requireLeader()`, mesmo padrão de
+  `requireAdminOrSenior()`.
+- Cor de destaque desta área: `primary` (azul, `tailwind.config.ts`),
+  diferente do roxo (`secondary`) da área administrativa.
+
+Rode `supabase/lider_dashboard.sql` depois de `admin_celulas_membros.sql`
+— ativa o acesso de leitura do líder à própria célula/membros (que tinha
+ficado só de esboço, comentado, no módulo anterior), dá ao líder acesso
+de leitura a `themes`/`meetings` ativos, cria as policies de
+`meeting_records` (admin/senior têm acesso total; líder só lê/cria/edita
+os registros da própria célula) e adiciona a constraint `unique
+(cell_id, meeting_id)` usada pelo "marcar como realizada".

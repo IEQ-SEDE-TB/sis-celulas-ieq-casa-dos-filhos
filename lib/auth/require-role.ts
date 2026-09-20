@@ -26,3 +26,23 @@ export async function requireAdminOrSenior(): Promise<Profile> {
 
   return current.profile;
 }
+
+/**
+ * Garante que o usuário logado está aprovado e tem role "leader"; caso
+ * contrário redireciona para a página inicial. Mesma lógica de
+ * requireAdminOrSenior, mas para a área do líder — precisa ser chamada
+ * nas páginas de /lider e no início de cada Server Action do módulo.
+ */
+export async function requireLeader(): Promise<Profile> {
+  const current = await getCurrentProfile();
+
+  if (!current || !current.profile || current.profile.status !== "approved") {
+    redirect("/");
+  }
+
+  if (current.profile.role !== "leader") {
+    redirect("/");
+  }
+
+  return current.profile;
+}

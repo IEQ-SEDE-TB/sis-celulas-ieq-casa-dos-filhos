@@ -33,30 +33,7 @@ create policy "members_all_admin_senior"
   with check (public.current_profile_role() in ('admin', 'senior'));
 
 -- ---------------------------------------------------------------------
--- Preparado para o dashboard do líder (NÃO executar ainda).
---
--- Quando o módulo do líder for construído, cada líder deve enxergar
--- (e futuramente editar) apenas a própria célula e os membros dela.
--- Descomente e rode os dois blocos abaixo nessa etapa:
---
--- create policy "cells_select_own_leader"
---   on cells for select
---   to authenticated
---   using (
---     leader_id = (
---       select id from profiles where auth_user_id = auth.uid()
---     )
---   );
---
--- create policy "members_select_own_leader"
---   on members for select
---   to authenticated
---   using (
---     cell_id in (
---       select id from cells
---       where leader_id = (
---         select id from profiles where auth_user_id = auth.uid()
---       )
---     )
---   );
+-- O acesso de leitura do líder à própria célula/membros (rascunhado
+-- aqui como comentário) foi ativado em supabase/lider_dashboard.sql,
+-- junto com o restante das policies do módulo do líder.
 -- ---------------------------------------------------------------------

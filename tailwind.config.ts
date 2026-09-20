@@ -8,9 +8,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Cor de destaque (azul) usada na área do líder, para
+        // diferenciar visualmente da área administrativa (roxo).
+        primary: {
+          50: "#eff6ff",
+          100: "#dbeafe",
+          200: "#bfdbfe",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#3b82f6",
+          600: "#2563eb",
+          700: "#1d4ed8",
+          800: "#1e40af",
+          900: "#1e3a8a",
+          950: "#172554",
+        },
         // Cor de destaque (roxo) usada nas áreas administrativas, para
-        // diferenciar visualmente da área do líder (que usará a cor
-        // primária/neutra padrão).
+        // diferenciar visualmente da área do líder.
         secondary: {
           50: "#faf5ff",
           100: "#f3e8ff",

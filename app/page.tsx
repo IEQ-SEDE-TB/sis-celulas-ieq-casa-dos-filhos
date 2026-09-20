@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
+import { getLeaderCell } from "@/lib/data/leader-cell";
 
 export default async function HomePage() {
   const current = await getCurrentProfile();
@@ -10,6 +11,21 @@ export default async function HomePage() {
   }
 
   const isApproved = current?.profile?.status === "approved";
+
+  if (isApproved && current?.profile) {
+    if (current.profile.role === "admin" || current.profile.role === "senior") {
+      redirect("/admin/temas");
+    }
+
+    if (current.profile.role === "leader") {
+      const cell = await getLeaderCell(current.profile.id);
+      if (cell) {
+        redirect("/lider/dashboard");
+      }
+      // Leader sem célula vinculada ainda: fica na home com a mensagem
+      // abaixo, em vez de redirecionar para um dashboard vazio.
+    }
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16">
@@ -29,8 +45,10 @@ export default async function HomePage() {
             <p className="mt-1 text-xs text-gray-400">
               Perfil: {current.profile.role} &middot; {current.user.email}
             </p>
-            <p className="mt-4 text-xs text-gray-400">
-              O painel ainda está em construção.
+            <p className="mt-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              Você ainda não está vinculado a nenhuma célula como líder.
+              Fale com um administrador para que ele associe seu usuário
+              a uma célula.
             </p>
             <form action="/auth/signout" method="post" className="mt-6">
               <button
